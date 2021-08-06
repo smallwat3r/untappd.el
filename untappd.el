@@ -4,7 +4,7 @@
 
 ;; Author: Matthieu Petiteau <matt@smallwat3r.com>
 ;; URL: https://github.com/smallwat3r/untappd.el
-;; Package-Requires: ((emacs "26.1") (request "0.3.2") (emojify "1.2.0"))
+;; Package-Requires: ((emacs "26.1") (request "0.3.2") (emojify "1.2.1"))
 ;; Version: 0.0.1
 
 ;; This file is NOT part of GNU Emacs.
