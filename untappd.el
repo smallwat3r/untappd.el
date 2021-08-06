@@ -24,7 +24,7 @@
 
 ;;; Commentary:
 ;; This package allows you to fetch your latest untappd feed and
-;; display the latest information.
+;; display it in a new buffer.
 
 ;;; Code:
 
