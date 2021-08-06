@@ -4,7 +4,7 @@
 
 ;; Author: Matthieu Petiteau <matt@smallwat3r.com>
 ;; URL: https://github.com/smallwat3r/untappd.el
-;; Package-Requires: ((emacs "26.1") (request "0.3.2"))
+;; Package-Requires: ((emacs "26.1") (request "0.3.2") (emojify "1.2.0"))
 ;; Version: 0.0.1
 
 ;; This file is NOT part of GNU Emacs.
@@ -30,6 +30,7 @@
 
 (require 'cl-lib)
 (require 'request)
+(require 'emojify)
 
 (defcustom untappd-access-token nil
   "Untappd access token."
@@ -74,7 +75,7 @@
             (concat " @ " (assoc-default 'venue_name venue)))))
 
 (defun untappd--format-checkin-description (comment user toasts)
-  "Format the content with the USER, checkin COMMENT and number of TOASTS.."
+  "Format the content with the USER, checkin COMMENT and number of TOASTS."
   (format "(%s) %s %s (%s): %s"
           (concat (number-to-string (assoc-default 'total_count toasts)) "🍻")
           (assoc-default 'first_name user)
@@ -107,8 +108,8 @@
   (setq buffer-read-only t))
 
 (defun untappd--query-feed ()
-  "Get recent activity feed data from untappd using the user ACCESS-TOKEN."
-  (request (concat untappd-feed-api-url (concat "?access_token=" untappd-access-token))
+  "Get recent activity feed data from Untappd."
+  (request (concat untappd-feed-api-url (concat "?access_token=" untappd-access-token "&limit=50"))
            :parser 'json-read
            :success
            (cl-function
