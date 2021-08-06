@@ -84,12 +84,19 @@
           (if (or (eq comment nil) (eq comment "")) "-"
             comment)))
 
+(defun untappd--format-checkin-external-link (user id)
+  "Format the URL link of the page of the USER checkin ID."
+  (propertize (format "https://untappd.com/user/%s/checkin/%s"
+                      (assoc-default 'user_name user) id)
+              'face 'link))
+
 (defun untappd--render-feed (data buffer)
   "Render DATA in the untappd BUFFER."
   (switch-to-buffer-other-window buffer)
   (setq buffer-read-only nil)
   (erase-buffer)
   (let* ((items   (assoc-default 'items (assoc-default 'checkins (assoc-default 'response data))))
+         (id      (mapcar (lambda (item) (assoc-default 'checkin_id item)) items))
          (rating  (mapcar (lambda (item) (assoc-default 'rating_score item)) items))
          (comment (mapcar (lambda (item) (assoc-default 'checkin_comment item)) items))
          (date    (mapcar (lambda (item) (assoc-default 'created_at item)) items))
@@ -98,12 +105,13 @@
          (brewery (mapcar (lambda (item) (assoc-default 'brewery item)) items))
          (venue   (mapcar (lambda (item) (assoc-default 'venue item)) items))
          (toasts  (mapcar (lambda (item) (assoc-default 'toasts item)) items)))
-    (cl-mapcar (lambda (rating comment date user beer brewery venue toasts)
+    (cl-mapcar (lambda (id rating comment date user beer brewery venue toasts)
                  (insert (concat
                           (untappd--format-checkin-header rating beer brewery) "\n"
                           (untappd--format-checkin-details date venue) "\n"
-                          (untappd--format-checkin-description comment user toasts) "\n\n")))
-               rating comment date user beer brewery venue toasts))
+                          (untappd--format-checkin-description comment user toasts) "\n"
+                          (untappd--format-checkin-external-link user id) "\n\n")))
+               id rating comment date user beer brewery venue toasts))
   (goto-char (point-min))
   (setq buffer-read-only t))
 
