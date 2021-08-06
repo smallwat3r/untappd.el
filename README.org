@@ -1,0 +1,46 @@
+#+TITLE: untappd.el
+
+Display your latest [[https://untappd.com][Untappd]] feed in Emacs.
+
+* Installation
+
+** Manual
+
+Clone the repository:
+#+begin_src shell
+git clone https://github.com/smallwat3r/untappd.el.git
+#+end_src
+
+And add the =untappd.el= directory to your =load-path=:
+#+begin_src elisp
+(add-to-list 'load-path "path/to/untappd.el")
+(require 'untappd)
+#+end_src
+
+** Doom Emacs
+
+Add the following to your =packages.el= file:
+#+begin_src elisp
+(package! untappd :recipe
+  (:host github
+   :repo "smallwat3r/untappd.el"))
+#+end_src
+
+* Set-up
+
+You must have a =client_id= and a =client-secret= from Untappd in order to generate an =access_token= that you can use to authenticate to the Untappd API. You can find the documentation about this [[https://untappd.com/api/docs][here]].
+
+You can set-up a =untappd-access-token= variable in your Emacs configuration.
+#+begin_src elisp
+(setq untappd-access-token "<token>")
+#+end_src
+
+*I highly suggest securing your token using the Emacs [[https://www.gnu.org/software/emacs/manual/html_node/auth/index.html][auth-source]] library or any other alternatives.*
+
+* Usage
+
+Run =M-x untappd-feed=, it will open a new buffer showing your latest Untappd feed.
+
+* Screenshots
+
+[[./images/img1.png]]
