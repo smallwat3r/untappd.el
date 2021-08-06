@@ -30,7 +30,7 @@ Add the following to your =packages.el= file:
 
 You must have a =client_id= and a =client-secret= from Untappd in order to generate an =access_token= that you can use to authenticate to the Untappd API. You can find the documentation about this [[https://untappd.com/api/docs][here]].
 
-You can set-up a =untappd-access-token= variable in your Emacs configuration.
+You can then set-up an =untappd-access-token= variable in your Emacs configuration.
 #+begin_src elisp
 (setq untappd-access-token "<token>")
 #+end_src
