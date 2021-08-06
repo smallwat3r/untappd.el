@@ -37,7 +37,7 @@ You can then set-up an =untappd-access-token= variable in your Emacs configurati
 
 *I highly suggest securing your token using the Emacs [[https://www.gnu.org/software/emacs/manual/html_node/auth/index.html][auth-source]] library or any other alternatives.*
 
-As an example here is what I use on my Doom Emacs set-up
+As an example here is what I use on my Doom Emacs set-up:
 #+begin_src elisp
 (use-package! untappd
   :commands (untappd-feed)
