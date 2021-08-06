@@ -71,7 +71,7 @@
 (defun untappd--format-checkin-details (date venue)
   "Format the checking details with the DATE and the VENUE."
   (concat date
-          (if (= (length venue) 0) ""
+          (if (eq (length venue) 0) ""
             (concat " @ " (assoc-default 'venue_name venue)))))
 
 (defun untappd--format-checkin-description (comment user toasts)
