@@ -53,11 +53,11 @@
 (defun untappd--format-rating (rating)
   "Format beer RATING."
   (propertize
-   (cond ((>= rating 4.5) "●●●●●")
-         ((>= rating 4)   "●●●● ")
-         ((>= rating 3)   "●●●  ")
-         ((>= rating 2)   "●●   ")
-         (t               "●    "))
+   (cond ((>= rating 4.5) "★★★★★")
+         ((>= rating 4)   "★★★★ ")
+         ((>= rating 3)   "★★★  ")
+         ((>= rating 2)   "★★   ")
+         (t               "★    "))
    'face 'untappd-rating-icon-face))
 
 (defun untappd--format-checkin-header (rating beer brewery)
