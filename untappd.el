@@ -117,18 +117,21 @@
 
 (defun untappd--query-feed ()
   "Get recent activity feed data from Untappd."
-  (request (concat untappd-feed-api-url (concat "?access_token=" untappd-access-token "&limit=50"))
-           :parser 'json-read
-           :success
-           (cl-function
-            (lambda (&key data &allow-other-keys)
-              (let ((buffer (get-buffer-create "*untappd*")))
-                (untappd--render-feed data buffer))))
-           :error
-           (cl-function
-            (lambda (&rest args &key error-thrown &allow-other-keys)
-              (message "An error has occurred while reaching the untappd API: %s"
-                       error-thrown)))))
+  (request untappd-feed-api-url
+    :params (let ((params '((limit . 50) (access_token nil))))
+              (setf (alist-get 'access_token params) untappd-access-token)
+              params)
+    :parser 'json-read
+    :success
+    (cl-function
+     (lambda (&key data &allow-other-keys)
+       (let ((buffer (get-buffer-create "*untappd*")))
+         (untappd--render-feed data buffer))))
+    :error
+    (cl-function
+     (lambda (&rest args &key error-thrown &allow-other-keys)
+       (message "An error has occurred while reaching the untappd API: %s"
+                error-thrown)))))
 
 ;;;###autoload
 (defun untappd-feed ()
