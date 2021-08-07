@@ -29,8 +29,8 @@
 ;;; Code:
 
 (require 'cl-lib)
-(require 'request)
 (require 'emojify)
+(require 'request)
 
 (defcustom untappd-access-token nil
   "Untappd access token."
