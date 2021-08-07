@@ -1,4 +1,4 @@
-;;; untappd.el --- Display your latest untappd feed -*- lexical-binding: t; -*-
+;;; untappd.el --- Display your latest Untappd feed -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2021 Matthieu Petiteau
 
@@ -23,7 +23,7 @@
 ;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-;; This package allows you to fetch your latest untappd feed and
+;; This package allows you to fetch your latest Untappd feed and
 ;; display it in a new buffer.
 
 ;;; Code:
@@ -130,12 +130,12 @@
     :error
     (cl-function
      (lambda (&rest args &key error-thrown &allow-other-keys)
-       (message "An error has occurred while reaching the untappd API: %s"
+       (message "An error has occurred while reaching the Untappd API: %s"
                 error-thrown)))))
 
 ;;;###autoload
 (defun untappd-feed ()
-  "Get the current feed from your untappd account."
+  "Get the current feed from your Untappd account."
   (interactive)
   (untappd--query-feed))
 
