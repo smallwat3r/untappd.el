@@ -6,6 +6,10 @@ Display your latest [[https://untappd.com][Untappd]] feed in Emacs.
 
 * Installation
 
+** Melpa
+
+A melpa [[https://melpa.org/#/untappd][package]] is available for tubestatus.
+
 ** Manual
 
 Clone the repository:
@@ -17,15 +21,6 @@ And add the =untappd.el= directory to your =load-path=:
 #+begin_src elisp
 (add-to-list 'load-path "path/to/untappd.el")
 (require 'untappd)
-#+end_src
-
-** Doom Emacs
-
-Add the following to your =packages.el= file:
-#+begin_src elisp
-(package! untappd :recipe
-  (:host github
-   :repo "smallwat3r/untappd.el"))
 #+end_src
 
 * Set-up
