@@ -81,7 +81,7 @@
           (assoc-default 'first_name user)
           (assoc-default 'last_name user)
           (propertize (assoc-default 'user_name user) 'face 'untappd-main-element-face)
-          (if (or (eq comment nil) (eq comment "")) "-"
+          (if (or (not comment) (eq comment "")) "-"
             comment)))
 
 (defun untappd--format-checkin-external-link (user id)
@@ -106,11 +106,10 @@
          (venue   (mapcar (lambda (item) (assoc-default 'venue item)) items))
          (toasts  (mapcar (lambda (item) (assoc-default 'toasts item)) items)))
     (cl-mapcar (lambda (id rating comment date user beer brewery venue toasts)
-                 (insert (concat
-                          (untappd--format-checkin-header rating beer brewery) "\n"
-                          (untappd--format-checkin-details date venue) "\n"
-                          (untappd--format-checkin-description comment user toasts) "\n"
-                          (untappd--format-checkin-external-link user id) "\n\n")))
+                 (insert (untappd--format-checkin-header rating beer brewery) "\n"
+                         (untappd--format-checkin-details date venue) "\n"
+                         (untappd--format-checkin-description comment user toasts) "\n"
+                         (untappd--format-checkin-external-link user id) "\n\n"))
                id rating comment date user beer brewery venue toasts))
   (goto-char (point-min))
   (setq buffer-read-only t))

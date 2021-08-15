@@ -1,5 +1,7 @@
 #+TITLE: 🍻 untappd.el
 
+[[https://melpa.org/#/untappd][file:https://melpa.org/packages/untappd-badge.svg]]
+
 Display your latest [[https://untappd.com][Untappd]] feed in Emacs.
 
 * Installation
