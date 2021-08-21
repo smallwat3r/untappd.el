@@ -8,7 +8,7 @@ Display your latest [[https://untappd.com][Untappd]] feed in Emacs.
 
 ** Melpa
 
-A melpa [[https://melpa.org/#/untappd][package]] is available for tubestatus.
+A melpa [[https://melpa.org/#/untappd][package]] is available for untappd.
 
 ** Manual
 
