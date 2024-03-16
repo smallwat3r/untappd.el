@@ -48,4 +48,4 @@ Run =M-x untappd-feed=, it will open a new buffer showing your latest Untappd fe
 
 * Screenshots
 
-[[./images/img1.png]]
+[[./images/untappd.png]]

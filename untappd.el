@@ -90,21 +90,25 @@
                       (assoc-default 'user_name user) id)
               'face 'link))
 
+(defun untappd--get-from-object (key object)
+  "Get KEY from OBJECT."
+  (mapcar (lambda (obj) (assoc-default key obj)) object))
+
 (defun untappd--render-feed (data buffer)
   "Render DATA in the untappd BUFFER."
   (switch-to-buffer-other-window buffer)
   (setq buffer-read-only nil)
   (erase-buffer)
   (let* ((items   (assoc-default 'items (assoc-default 'checkins (assoc-default 'response data))))
-         (id      (mapcar (lambda (item) (assoc-default 'checkin_id item)) items))
-         (rating  (mapcar (lambda (item) (assoc-default 'rating_score item)) items))
-         (comment (mapcar (lambda (item) (assoc-default 'checkin_comment item)) items))
-         (date    (mapcar (lambda (item) (assoc-default 'created_at item)) items))
-         (user    (mapcar (lambda (item) (assoc-default 'user item)) items))
-         (beer    (mapcar (lambda (item) (assoc-default 'beer item)) items))
-         (brewery (mapcar (lambda (item) (assoc-default 'brewery item)) items))
-         (venue   (mapcar (lambda (item) (assoc-default 'venue item)) items))
-         (toasts  (mapcar (lambda (item) (assoc-default 'toasts item)) items)))
+         (id      (untappd--get-from-object 'checkin_id items))
+         (rating  (untappd--get-from-object 'rating_score items))
+         (comment (untappd--get-from-object 'checkin_comment items))
+         (date    (untappd--get-from-object 'created_at items))
+         (user    (untappd--get-from-object 'user items))
+         (beer    (untappd--get-from-object 'beer items))
+         (brewery (untappd--get-from-object 'brewery items))
+         (venue   (untappd--get-from-object 'venue items))
+         (toasts  (untappd--get-from-object 'toasts items)))
     (cl-mapcar (lambda (id rating comment date user beer brewery venue toasts)
                  (insert (untappd--format-checkin-header rating beer brewery) "\n"
                          (untappd--format-checkin-details date venue) "\n"
