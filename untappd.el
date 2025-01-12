@@ -5,7 +5,7 @@
 ;; Author: Matthieu Petiteau <matt@smallwat3r.com>
 ;; URL: https://github.com/smallwat3r/untappd.el
 ;; Package-Requires: ((emacs "26.1") (request "0.3.2") (emojify "1.2.1"))
-;; Version: 0.0.1
+;; Version: 0.0.2
 
 ;; This file is NOT part of GNU Emacs.
 
@@ -32,26 +32,39 @@
 (require 'emojify)
 (require 'request)
 
+(defgroup untappd nil
+  "Integration with the Untappd platform."
+  :group 'applications)
+
+;;; Customizable Variables
 (defcustom untappd-access-token nil
-  "Untappd access token."
+  "Access token for Untappd API authentication."
   :group 'untappd
   :type 'string)
 
-(defvar untappd-feed-api-url "https://api.untappd.com/v4/checkin/recent"
-  "Untappd feed API endpoint.")
+(defcustom untappd-feed-api-url "https://api.untappd.com/v4/checkin/recent"
+  "API endpoint for fetching recent check-ins."
+  :group 'untappd
+  :type 'string)
 
+;;; Faces
 (defface untappd-rating-icon-face
   '((t :foreground "gold"))
-  "The face used on the rating icon."
-  :group 'untappd-faces)
+  "Face for displaying the rating icons."
+  :group 'untappd)
 
 (defface untappd-main-element-face
   '((t :weight bold))
-  "The face used to display the main elements."
-  :group 'untappd-faces)
+  "Face for highlighting main elements like beer and brewery names."
+  :group 'untappd)
+
+;;; Utility Functions
+(defun untappd--get-from-object (key object)
+  "Extract values for KEY from a list of OBJECTs."
+  (mapcar (lambda (obj) (assoc-default key obj)) object))
 
 (defun untappd--format-rating (rating)
-  "Format beer RATING."
+  "Format RATING as a string of stars."
   (propertize
    (cond ((>= rating 4.5) "★★★★★")
          ((>= rating 4)   "★★★★ ")
@@ -60,45 +73,42 @@
          (t               "★    "))
    'face 'untappd-rating-icon-face))
 
+;;; Formatting Functions
 (defun untappd--format-checkin-header (rating beer brewery)
-  "Format the checkin header line with the RATING, BEER and BREWERY."
-  (format "%s (%s/5) 🍺 %s from %s"
+  "Format the header line for a checkin with RATING, BEER, and BREWERY."
+  (format "%s (%s/5) 🍺 %s (%s, %s%%) from %s (%s)"
           (untappd--format-rating rating)
           rating
           (propertize (assoc-default 'beer_name beer) 'face 'untappd-main-element-face)
-          (propertize (assoc-default 'brewery_name brewery) 'face 'untappd-main-element-face)))
+          (assoc-default 'beer_style beer)
+          (assoc-default 'beer_abv beer)
+          (propertize (assoc-default 'brewery_name brewery) 'face 'untappd-main-element-face)
+          (assoc-default 'country_name brewery)))
 
 (defun untappd--format-checkin-details (date venue)
-  "Format the checking details with the DATE and the VENUE."
+  "Format the details line for a checkin with DATE and VENUE."
   (concat date
           (if (eq (length venue) 0) ""
             (concat " @ " (assoc-default 'venue_name venue)))))
 
 (defun untappd--format-checkin-description (comment user toasts)
-  "Format the content with the USER, checkin COMMENT and number of TOASTS."
+  "Format the description for a checkin with COMMENT, USER, and TOASTS."
   (format "(%s) %s %s (%s): %s"
           (concat (number-to-string (assoc-default 'total_count toasts)) "🍻")
           (assoc-default 'first_name user)
           (assoc-default 'last_name user)
           (propertize (assoc-default 'user_name user) 'face 'untappd-main-element-face)
-          (if (or (not comment) (eq comment "")) "-"
-            comment)))
+          (if (or (not comment) (equal comment "")) "-" comment)))
 
 (defun untappd--format-checkin-external-link (user id)
-  "Format the URL link of the page of the USER checkin ID."
+  "Format the external link for a USER's checkin with ID."
   (propertize (format "https://untappd.com/user/%s/checkin/%s"
                       (assoc-default 'user_name user) id)
               'face 'link))
 
-(defun untappd--get-from-object (key object)
-  "Get KEY from OBJECT."
-  (mapcar (lambda (obj) (assoc-default key obj)) object))
-
-(defun untappd--render-feed (data buffer)
-  "Render DATA in the untappd BUFFER."
-  (switch-to-buffer-other-window buffer)
-  (setq buffer-read-only nil)
-  (erase-buffer)
+;;; Rendering Functions
+(defun untappd--render-checkin (data)
+  "Render the DATA in the current buffer."
   (let* ((items   (assoc-default 'items (assoc-default 'checkins (assoc-default 'response data))))
          (id      (untappd--get-from-object 'checkin_id items))
          (rating  (untappd--get-from-object 'rating_score items))
@@ -114,32 +124,41 @@
                          (untappd--format-checkin-details date venue) "\n"
                          (untappd--format-checkin-description comment user toasts) "\n"
                          (untappd--format-checkin-external-link user id) "\n\n"))
-               id rating comment date user beer brewery venue toasts))
-  (goto-char (point-min))
-  (setq buffer-read-only t))
+               id rating comment date user beer brewery venue toasts)))
 
+(defun untappd--render-feed (data buffer)
+  "Render the Untappd feed DATA into BUFFER."
+  (with-current-buffer (get-buffer-create buffer)
+    (let ((inhibit-read-only t))
+      (erase-buffer)
+      (untappd--render-checkin data)
+      (goto-char (point-min))
+      (setq buffer-read-only t)))
+  (switch-to-buffer-other-window buffer))
+
+;;; API Query
 (defun untappd--query-feed ()
-  "Get recent activity feed data from Untappd."
+  "Query the Untappd API for the recent activity feed."
   (request untappd-feed-api-url
-    :params (let ((params '((limit . 50) (access_token nil))))
-              (setf (alist-get 'access_token params) untappd-access-token)
-              params)
+    :params `(("limit" . "50")
+              ("access_token" . ,untappd-access-token))
     :parser 'json-read
     :success
     (cl-function
      (lambda (&key data &allow-other-keys)
-       (let ((buffer (get-buffer-create "*untappd*")))
-         (untappd--render-feed data buffer))))
+       (untappd--render-feed data "*untappd*")))
     :error
     (cl-function
-     (lambda (&rest args &key error-thrown &allow-other-keys)
-       (message "An error has occurred while reaching the Untappd API: %s"
-                error-thrown)))))
+     (lambda (&key error-thrown &allow-other-keys)
+       (message "Error querying the Untappd API: %s" error-thrown)))))
 
+;;; User Command
 ;;;###autoload
 (defun untappd-feed ()
-  "Get the current feed from your Untappd account."
+  "Fetch and display the Untappd feed."
   (interactive)
+  (unless untappd-access-token
+    (user-error "Untappd access token is not set"))
   (untappd--query-feed))
 
 (provide 'untappd)
